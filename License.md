@@ -60,4 +60,4 @@ Cyber Commandos reserves the right to update this license in future versions of 
 ---
 
 ## **8. Contact**  
-For permissions, inquiries, or further information, contact **Cyber Commandos** at [support@cybercommandos.com](mailto:support@cybercommandos.com).  
+For permissions, inquiries, or further information, contact **Cyber Commandos** at [biswadebmmukherjee941@gmail.com](mailto:biswadebmmukherjee941@gmail.com).  
