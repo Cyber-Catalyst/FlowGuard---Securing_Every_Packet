@@ -1,3 +1,4 @@
+import csv
 import socket
 import time
 import subprocess
@@ -6,9 +7,10 @@ import requests
 import re
 import threading
 from urllib.parse import urlparse
-import psutil  # New library for system resource monitoring
-import numpy as np  # For filtering and smoothing data
+import psutil  
+import numpy as np  
 
+#Class for Performing Benchmarking
 class MetricsTool:
     def __init__(self, url, endpoint="", port=None, duration=60):
         self.url = url
@@ -18,12 +20,13 @@ class MetricsTool:
         self.latency_values = []
         self.timestamps = []
         self.throughputs = []
-        self.cpu_usages = []  # New list for CPU usage
-        self.memory_usages = []  # New list for memory usage
+        self.cpu_usages = []
+        self.memory_usages = []
         self.ip_address = self.resolve_url_to_ip()
         if not self.port and self.ip_address:
             self.port = self.find_open_port()
 
+#If url is specified that it resolve the ip address of the url and connect to the server using the ip address
     def resolve_url_to_ip(self):
         """Resolve URL to IP address."""
         try:
@@ -34,6 +37,7 @@ class MetricsTool:
             print(f"Error: Unable to resolve URL '{self.url}'. Please check the domain name.")
             return None
 
+# if user doesn't not to which port to connect to the server then user can leave it blank and it will automatically find the first open port to which it will connect
     def find_open_port(self):
         """Find an open port on the target IP."""
         print("No port provided or specified port not reachable. Scanning for an open port...")
@@ -49,6 +53,7 @@ class MetricsTool:
         print("No open ports found.")
         return None
 
+# code for validating the url for server connections
     @staticmethod
     def validate_url(url):
         try:
@@ -66,7 +71,8 @@ class MetricsTool:
         """Normalize the URL with the endpoint."""
         base_url = re.sub(r'^(http://|https://|www\.)', '', self.url)
         return f"http://{base_url}/{self.endpoint.lstrip('/')}" if self.endpoint else f"http://{base_url}"
-
+    
+    # then this function is called to measure latency 
     def measure_latency(self):
         """Measure latency using ICMP ping."""
         start_time = time.time()
@@ -84,13 +90,17 @@ class MetricsTool:
                         if "time=" in line:
                             latency = float(line.split("time=")[1].split(" ms")[0])
                             self.latency_values.append(latency)
+                            self.timestamps.append(int(time.time()))
                 else:
                     self.latency_values.append(0)
+                    self.timestamps.append(int(time.time()))
             except Exception as e:
                 print(f"Error measuring latency: {e}")
                 self.latency_values.append(0)
+                self.timestamps.append(int(time.time()))
             time.sleep(1)
 
+#this code is for measuring the throughput
     def measure_throughput(self):
         """Measure throughput by downloading data from the target URL."""
         normalized_url = self.normalize_url()
@@ -107,11 +117,11 @@ class MetricsTool:
                 download_end = time.time()
                 elapsed_time = download_end - download_start
                 throughput = (total_bytes * 8) / (elapsed_time * 1e6)  # Mbps
-                self.timestamps.append(time.time() - start_time)
                 self.throughputs.append(throughput)
             except Exception as e:
                 print(f"Error during throughput measurement: {e}")
 
+# for measuring resource like cpu and memory usage and how it affecting the server
     def measure_resources(self):
         """Measure CPU and memory usage."""
         start_time = time.time()
@@ -144,7 +154,24 @@ class MetricsTool:
         throughput_thread.join()
         resource_thread.join()
 
+        self.dump_to_csv()
         self.plot_metrics()
+
+    def dump_to_csv(self):
+        """Save collected data to a CSV file."""
+        filename = f"metrics_{int(time.time())}.csv"
+        with open(filename, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Timestamp", "Latency (ms)", "Throughput (Mbps)", "CPU Usage (%)", "Memory Usage (%)"])
+            for i in range(len(self.timestamps)):
+                writer.writerow([
+                    self.timestamps[i] if i < len(self.timestamps) else "",
+                    self.latency_values[i] if i < len(self.latency_values) else "",
+                    self.throughputs[i] if i < len(self.throughputs) else "",
+                    self.cpu_usages[i] if i < len(self.cpu_usages) else "",
+                    self.memory_usages[i] if i < len(self.memory_usages) else "",
+                ])
+        print(f"Data saved to {filename}")
 
     def filter_data(self, data, threshold=2.0):
         """Filter out noisy data points using z-score thresholding."""
@@ -179,7 +206,7 @@ class MetricsTool:
         axs[0, 0].grid(True)
 
         # Throughput plot
-        axs[0, 1].plot(self.timestamps[:len(throughput_values)], throughput_values, marker="o", label="Throughput (Mbps)", color="green")
+        axs[0, 1].plot(range(len(throughput_values)), throughput_values, marker="o", label="Throughput (Mbps)", color="green")
         axs[0, 1].set_title("Throughput Over Time")
         axs[0, 1].set_xlabel("Time (seconds)")
         axs[0, 1].set_ylabel("Throughput (Mbps)")
@@ -205,7 +232,6 @@ class MetricsTool:
         plt.tight_layout()
         plt.show()
 
-
 def convert_duration(duration_str):
     """Convert duration string to seconds."""
     if duration_str.lower().endswith('m'):
@@ -214,7 +240,6 @@ def convert_duration(duration_str):
         return int(duration_str[:-1])
     else:
         return int(duration_str)
-
 
 if __name__ == "__main__":
     while True:
