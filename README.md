@@ -57,6 +57,13 @@ The benchmarking tool performs the following steps:
 - Logs and visualizes the data to show how the IDS/IPS is performing as traffic increases.
 - Provides detailed insights and metrics to help improve the IDS/IPS configuration and performance.
 
+See the Video given below for detailed information:-
+<video width="1920" height="1080" autoplay loop controls>
+  <source src="https://www.linkedin.com/posts/biswadeb-mukherjee_hello-connections-welcoming-you-all-to-our-activity-7287891773509558272-wsQr?utm_source=share&utm_medium=member_desktop" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+
 ## Project Structure
 
 Want to see the project structure? Then [Click Me](Project.md)
