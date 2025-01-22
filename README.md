@@ -59,8 +59,6 @@ The benchmarking tool performs the following steps:
 
 See the Video given below for detailed information:-
 
-https://www.linkedin.com/posts/biswadeb-mukherjee_hello-connections-welcoming-you-all-to-our-activity-7287891773509558272-wsQr?utm_source=share&utm_medium=member_desktop" type="video/mp4">
-
 
 
 ## Project Structure
